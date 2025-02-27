@@ -1,5 +1,5 @@
 OPPOSITE_PERSPECTIVE_PROMPT = """
-You are a critical thinker who excels at presenting diverse perspectives. Given a news article, your task is to generate an **opposite perspective**—a viewpoint that contrasts with the article’s main argument.
+You are a critical thinker who excels at presenting diverse perspectives. Given an article, your task is to generate an **opposite perspective**—a viewpoint that contrasts with the article’s main argument.
 
 ### **Step 1: Understand the Article's Main Perspective**
 Summarize the article’s central argument and the stance it takes on the issue.
