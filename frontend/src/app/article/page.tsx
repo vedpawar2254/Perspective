@@ -1,12 +1,13 @@
 'use client';
 
+import React from 'react';
 import { useState } from 'react';
 import { Container, Typography, TextField, Button, Card, CardContent, Box, Stack } from '@mui/material';
 import ChatMessage from '@/app/components/ChatMessage';
 import Navbar from '@/app/components/Navbar';
-import React from 'react';
+import TextToSpeech from '../components/TextToSpeech';
 import ExportButton from '../components/Utils/ExportButton';
-
+  
 export default function Article() {
   const [message, setMessage] = useState('');
   const [url, setUrl] = useState('');
@@ -55,6 +56,11 @@ export default function Article() {
                   Article Summary
                 </Typography>
                 <Typography variant="body1" paragraph>
+
+{/* Text-to-speech */}
+                <div className="p-4">
+                  <TextToSpeech text={summary} />
+                </div>
                   {summary}
                 </Typography>
                 <Typography variant="subtitle2" color="textSecondary" fontWeight="bold">
@@ -72,6 +78,10 @@ export default function Article() {
                   AI Perspective
                 </Typography>
                 <Typography variant="body1" paragraph>
+                  {/* Text-to-speech */}
+                <div className="p-4">
+                  <TextToSpeech text={aiPerspective} />
+                </div>
                   {aiPerspective}
                 </Typography>
               </CardContent>
