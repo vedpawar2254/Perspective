@@ -15,6 +15,7 @@ import {
 import ChatMessage from "@/app/components/ChatMessage";
 import Navbar from "@/app/components/Navbar";
 import { useSearchParams } from "next/navigation";
+import TextToSpeech from '../components/TextToSpeech';
 
 export default function Article() {
   const [message, setMessage] = useState("");
@@ -33,13 +34,8 @@ export default function Article() {
   useEffect(() => {
     setUrl(articleUrl);
   }, [articleUrl]);
-'use client';
 
-import { useState } from 'react';
-import { Container, Typography, TextField, Button, Card, CardContent, Box, Stack } from '@mui/material';
-import ChatMessage from '@/app/components/ChatMessage';
-import Navbar from '@/app/components/Navbar';
-import TextToSpeech from '../components/TextToSpeech';
+
 
   // Fetch summary and perspective from backend endpoints as soon as articleUrl is available
   useEffect(() => {
@@ -136,6 +132,8 @@ import TextToSpeech from '../components/TextToSpeech';
                   >
                     Article Summary
                   </Typography>
+                  <TextToSpeech text={summary} />
+
                   <Typography variant="body1" paragraph>
                     {summary}
                   </Typography>
@@ -161,7 +159,7 @@ import TextToSpeech from '../components/TextToSpeech';
               </Card>
             )}
 
-            {/* Modified AI Perspective Section to render only the JSON snippet */}
+            {/* Perspective Section to render only the JSON snippet */}
             {isPerspectiveLoading ? (
               <Box
                 display="flex"
@@ -173,6 +171,8 @@ import TextToSpeech from '../components/TextToSpeech';
               </Box>
             ) : (
               <Card sx={cardStyle}>
+                <div className="p-4">
+                </div>
                 <CardContent sx={{ p: 4 }}>
                   <Typography
                     variant="h5"
@@ -182,6 +182,8 @@ import TextToSpeech from '../components/TextToSpeech';
                   >
                     AI Perspective
                   </Typography>
+                  <TextToSpeech text={perspective} />
+
                   <div>
                     {perspective}
                   </div>
@@ -189,43 +191,9 @@ import TextToSpeech from '../components/TextToSpeech';
                 </CardContent>
               </Card>
             )}
-            <Card sx={cardStyle}>
-              <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom color="primary.main">
-                  Article Summary
-                </Typography>
-                <Typography variant="body1" paragraph>
+           
 
-{/* Text-to-speech */}
-                <div className="p-4">
-                  <TextToSpeech text={summary} />
-                </div>
-                  {summary}
-                </Typography>
-                <Typography variant="subtitle2" color="textSecondary" fontWeight="bold">
-                  Source Article:
-                </Typography>
-                <Typography variant="body2" color="primary" component="a" href={url || '#'} target="_blank" rel="noopener noreferrer" sx={{ wordBreak: 'break-word' }}>
-                  {url}
-                </Typography>
-              </CardContent>
-            </Card>
-
-            {/* AI Perspective Section */}
-            <Card sx={cardStyle}>
-              <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom color="primary.main">
-                  AI Perspective
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  {/* Text-to-speech */}
-                <div className="p-4">
-                  <TextToSpeech text={aiPerspective} />
-                </div>
-                  {aiPerspective}
-                </Typography>
-              </CardContent>
-            </Card>
+            
 
             {/* Discussion Section */}
             <Card sx={cardStyle}>

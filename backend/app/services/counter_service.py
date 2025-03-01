@@ -6,7 +6,7 @@ import os
 load_dotenv()
 hf_token = os.getenv("HF_TOKEN")
 
-PERSPECTIVE_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-alpha"
+PERSPECTIVE_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
 headers = {"Authorization": f"Bearer {hf_token}"}
 
 def generate_opposite_perspective(article_text):
