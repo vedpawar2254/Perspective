@@ -1,3 +1,4 @@
+
 def get_opposite_perspective_prompt():
     return """
     You are an analytical assistant that provides comprehensive alternative viewpoints to news articles and opinion pieces. Given the article text below, create a thoughtful, balanced, and detailed opposite perspective.
@@ -48,3 +49,4 @@ def get_opposite_perspective_prompt():
     
     Ensure that your response strictly adheres to this format, with the entire JSON object enclosed within the triple backticks.
     """
+
