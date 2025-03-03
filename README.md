@@ -123,6 +123,7 @@ npm run dev
 ```
 
 ### Backend Setup
+
 *Get HuggingFace Access Token:*
 - Go to HuggingFace website and create new access token.
 - copy that token
