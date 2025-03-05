@@ -21,13 +21,3 @@ def scrape_website(url, headers=None):
         print(f"Error: {e}")
         return None
 
-
-
-
-# # Example usage:
-# url = 'https://en.wikipedia.org/wiki/Bird'
-# raw_data = scrape_website(url)
-# clean_data = clean_scraped_data(raw_data)
-
-# print("Raw Data:"+raw_data)
-# print("Cleaned Data"+clean_data)
