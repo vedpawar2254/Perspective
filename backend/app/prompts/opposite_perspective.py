@@ -49,4 +49,3 @@ def get_opposite_perspective_prompt():
     
     Ensure that your response strictly adheres to this format, with the entire JSON object enclosed within the triple backticks.
     """
-
