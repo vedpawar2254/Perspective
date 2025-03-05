@@ -1,13 +1,20 @@
 from fastapi import FastAPI
 from app.routes import router
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 app = FastAPI(title="Perspective AI", version="1.0.0")
 
-# Include routes from routes.py
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(router)
 
-# Root endpoint (optional)
 @app.get("/")
 def home():
     return {"message": "Welcome to the Perspective AI"}

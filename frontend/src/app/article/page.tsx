@@ -1,104 +1,209 @@
+"use client";
+import { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Box,
+  Stack,
+  CircularProgress
+} from "@mui/material";
+import ChatMessage from "@/app/components/ChatMessage";
+import Navbar from "@/app/components/Navbar";
+import { useSearchParams } from "next/navigation";
+import TextToSpeech from '../components/TextToSpeech';
 
-
-
-'use client';
-
-import { useState } from 'react';
-import { Container, Typography, TextField, Button, Card, CardContent, Box, Stack } from '@mui/material';
-import ChatMessage from '@/app/components/ChatMessage';
-import Navbar from '@/app/components/Navbar';
-
+import ExportButton from '../components/Utils/ExportButton';
+import RelatedTopicsSidebar from '../components/RelatedTopicsSidebar';
 export default function Article() {
-  const [message, setMessage] = useState('');
-  const [url, setUrl] = useState('');
+  const [message, setMessage] = useState("");
+  const [url, setUrl,] = useState<string | null>(null);
 
-  const summary = "This is a placeholder for the article summary. The actual summary will be generated based on the provided URL using AI analysis.";
-  const aiPerspective = "This is where the AI's perspective and analysis of the article will be displayed, offering unique insights and key takeaways.";
-  const chatHistory = [
-    { isAI: true, message: "Hello! I've analyzed the article. What would you like to know about it?" },
-  ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // States for API responses and loading flags
+  const [summary, setSummary] = useState("");
+  const [perspective, setPerspective] = useState("");
+  const [isSummaryLoading, setIsSummaryLoading] = useState(true);
+  const [isPerspectiveLoading, setIsPerspectiveLoading] = useState(true);
+
+  const searchParams = useSearchParams();
+  const articleUrl = searchParams.get("url");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+
+  const handleSidebarToggle = (isOpen: boolean) => {
+    setIsSidebarOpen(isOpen)
+  }
+
+  // Update URL state when articleUrl changes
+  useEffect(() => {
+    setUrl(articleUrl);
+  }, [articleUrl]);
+
+
+  useEffect(() => {
+    if (articleUrl) {
+      const fetchData = async () => {
+        try {
+          // Get article summary
+          const response = await fetch("http://localhost:8000/scrape-and-summarize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: articleUrl })
+          });
+          const data = await response.json();
+          console.log("Received summary response:", data);
+          
+          // Adjust parsing based on the expected data structure.
+          // For example, if data.summary is an array:
+          const summaryText = data.summary;
+          // const summaryText = data;
+          if (!summaryText) {
+            throw new Error("Summary text not found in response");
+          }
+          setSummary(summaryText);
+          setIsSummaryLoading(false);
+  
+          // Request for AI perspective using the summary text
+          const resPerspective = await fetch("http://localhost:8000/generate-perspective", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ summary: summaryText })
+          });
+          const dataPerspective = await resPerspective.json();
+          console.log("Received perspective response:", dataPerspective);
+          setPerspective(dataPerspective.perspective);
+          setIsPerspectiveLoading(false);
+        } catch (error) {
+          console.error("Error fetching article analysis:", error);
+          setIsSummaryLoading(false);
+          setIsPerspectiveLoading(false);
+        }
+      };
+      fetchData();
+    }
+  }, [articleUrl]);
+  
+  const handleSubmit = (e:any) => {
     e.preventDefault();
     if (message.trim()) {
-      setMessage('');
+      setMessage("");
     }
   };
 
   const cardStyle = {
-    bgcolor: 'white',
+    bgcolor: "white",
     boxShadow: 3,
-    borderRadius: '20px',
-    '& .MuiCardContent-root': {
-      borderRadius: '20px',
-    }
+    borderRadius: "20px",
+    "& .MuiCardContent-root": { borderRadius: "20px" }
+  };
+
+  const handleExport = (format: string) => {
+    console.log(`Exporting in ${format} format`);
   };
 
   return (
     <>
       <Navbar />
-      <Box sx={{
-        bgcolor: '#111827',
-        background: 'linear-gradient(90deg, rgba(7, 0, 40, 1) 0%, rgba(23, 6, 66, 1) 50%, rgba(19, 0, 47, 1) 100%)',
-        color: 'white',
-        minHeight: '100vh',
-        py: 8
-      }}>
-        <Container maxWidth="lg">
+      <Box
+        sx={{
+          bgcolor: "#111827",
+          background:
+            "linear-gradient(90deg, rgba(7, 0, 40, 1) 0%, rgba(23, 6, 66, 1) 50%, rgba(19, 0, 47, 1) 100%)",
+          color: "white",
+          minHeight: "100vh",
+          py: 8
+        }}
+      >
+        <Container 
+        maxWidth="lg" 
+        sx={{ 
+          flexGrow: 1, 
+          pt: 4,
+          transition: 'transform 0.3s ease',
+          transform: isSidebarOpen ? 'translateX(-190px)' : 'translateX(0)'
+        }}
+      >
+          
           <Stack spacing={6}>
-            {/* Summary Section */}
+
             <Card sx={cardStyle}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom color="primary.main">
                   Article Summary
                 </Typography>
                 <Typography variant="body1" paragraph>
-                  {summary}
-                </Typography>
-                <Typography variant="subtitle2" color="textSecondary" fontWeight="bold">
-                  Source Article:
-                </Typography>
-                <Typography variant="body2" color="primary" component="a" href={url || '#'} target="_blank" rel="noopener noreferrer" sx={{ wordBreak: 'break-word' }}>
-                  {url}
-                </Typography>
-              </CardContent>
-            </Card>
 
-            {/* AI Perspective Section */}
-            <Card sx={cardStyle}>
-              <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom color="primary.main">
-                  AI Perspective
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  {aiPerspective}
-                </Typography>
-              </CardContent>
-            </Card>
 
-            {/* Discussion Section */}
+                  <TextToSpeech text={summary} />
+
+
+                <div className="p-4">
+                </div>
+                <CardContent sx={{ p: 4 }}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    gutterBottom
+                    color="primary.main"
+                  >
+                    AI Perspective
+                  </Typography>
+                  <TextToSpeech text={perspective} />
+
+                  <div>
+                    {perspective}
+                  </div>
+                  
+                </CardContent>
+              </Card>
+            )}
+           
+
+            
+
             <Card sx={cardStyle}>
-              <CardContent sx={{ 
-                p: 4,
-                flexGrow: 1, 
-                display: 'flex', 
-                flexDirection: 'column' 
-              }}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom color="primary.main">
+
+              <CardContent
+                sx={{
+                  p: 4,
+                  flexGrow: 1,
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  gutterBottom
+                  color="primary.main"
+                >
                   Discussion
                 </Typography>
-                <Box sx={{ 
-                  flexGrow: 1, 
-                  overflowY: 'auto', 
-                  maxHeight: 400, 
-                  mb: 3,
-                  borderRadius: '16px',
-                }}>
-                  {chatHistory.map((chat, index) => (
-                    <ChatMessage key={index} isAI={chat.isAI} message={chat.message} />
-                  ))}
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    overflowY: "auto",
+                    maxHeight: 400,
+                    mb: 3,
+                    borderRadius: "16px"
+                  }}
+                >
+                  <ChatMessage
+                    isAI={true}
+                    message="Hello! I've analyzed the article. What would you like to know about it?"
+                  />
                 </Box>
-                <Box component="form" onSubmit={handleSubmit} display="flex" gap={2}>
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit}
+                  display="flex"
+                  gap={2}
+                >
+
                   <TextField
                     fullWidth
                     variant="outlined"
@@ -106,16 +211,15 @@ export default function Article() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '12px',
-                      }
+                      "& .MuiOutlinedInput-root": {
+
                     }}
                   />
-                  <Button 
-                    type="submit" 
-                    variant="contained" 
+                  <Button
+                    type="submit"
+                    variant="contained"
                     color="primary"
-                    sx={{ borderRadius: '12px', px: 4 }}
+                    sx={{ borderRadius: "12px", px: 4 }}
                   >
                     Send
                   </Button>
@@ -125,6 +229,12 @@ export default function Article() {
           </Stack>
         </Container>
       </Box>
+      {/* Related Topics Sidebar */}
+      <RelatedTopicsSidebar
+          currentArticleUrl={url || undefined}
+          currentArticleSummary={summary || undefined}
+          onSidebarToggle={handleSidebarToggle}
+        />
     </>
   );
 }
