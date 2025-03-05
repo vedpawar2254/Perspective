@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useEffect } from "react";
 import {
@@ -16,11 +15,12 @@ import ChatMessage from "@/app/components/ChatMessage";
 import Navbar from "@/app/components/Navbar";
 import { useSearchParams } from "next/navigation";
 import TextToSpeech from '../components/TextToSpeech';
+
 import ExportButton from '../components/Utils/ExportButton';
-  
+import RelatedTopicsSidebar from '../components/RelatedTopicsSidebar';
 export default function Article() {
   const [message, setMessage] = useState("");
-  const [url, setUrl] = useState<string | null>(null);
+  const [url, setUrl,] = useState<string | null>(null);
 
 
   // States for API responses and loading flags
@@ -31,6 +31,12 @@ export default function Article() {
 
   const searchParams = useSearchParams();
   const articleUrl = searchParams.get("url");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+
+  const handleSidebarToggle = (isOpen: boolean) => {
+    setIsSidebarOpen(isOpen)
+  }
 
   // Update URL state when articleUrl changes
   useEffect(() => {
@@ -53,7 +59,8 @@ export default function Article() {
           
           // Adjust parsing based on the expected data structure.
           // For example, if data.summary is an array:
-          const summaryText = data.summary[0]?.summary_text;
+          const summaryText = data.summary;
+          // const summaryText = data;
           if (!summaryText) {
             throw new Error("Summary text not found in response");
           }
@@ -111,7 +118,16 @@ export default function Article() {
           py: 8
         }}
       >
-        <Container maxWidth="lg">
+        <Container 
+        maxWidth="lg" 
+        sx={{ 
+          flexGrow: 1, 
+          pt: 4,
+          transition: 'transform 0.3s ease',
+          transform: isSidebarOpen ? 'translateX(-190px)' : 'translateX(0)'
+        }}
+      >
+          
           <Stack spacing={6}>
 
             <Card sx={cardStyle}>
@@ -213,6 +229,12 @@ export default function Article() {
           </Stack>
         </Container>
       </Box>
+      {/* Related Topics Sidebar */}
+      <RelatedTopicsSidebar
+          currentArticleUrl={url || undefined}
+          currentArticleSummary={summary || undefined}
+          onSidebarToggle={handleSidebarToggle}
+        />
     </>
   );
 }
