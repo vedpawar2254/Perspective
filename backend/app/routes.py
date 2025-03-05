@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.scrapers.article_scraper import scrape_website
@@ -7,6 +6,10 @@ from app.services.summarization_service import summarize_text
 import json
 from app.services.counter_service import generate_opposite_perspective
 import logging
+from typing import List, Optional
+import uuid
+from sqlalchemy.orm import Session
+from app.services.related_topics import generate_related_topics
 
 router = APIRouter()
 logger = logging.getLogger("uvicorn.error")
@@ -16,6 +19,9 @@ class ArticleRequest(BaseModel):
 
 class ScrapURLRequest(BaseModel):
     url: str  # URL to scrape data from
+
+class RelatedTopicsRequest(BaseModel):
+    summary: str  # Ensure this matches the frontend's request
 
 @router.post("/generate-perspective")
 def generate_ai_perspective(request: ArticleRequest):
@@ -29,6 +35,7 @@ def generate_ai_perspective(request: ArticleRequest):
 
 @router.post("/scrape-and-summarize")
 async def scrape_article(article: ScrapURLRequest):
+    print("huhuh")
     try:
         if not article.url:
             raise HTTPException(status_code=422, detail="URL is required")
@@ -56,5 +63,7 @@ async def scrape_article(article: ScrapURLRequest):
         raise HTTPException(status_code=500, detail="Error processing the URL")
 
 
-
-
+@router.post("/related-topics")
+async def get_related_topics(request: RelatedTopicsRequest):
+    related_topics = generate_related_topics(request.summary)
+    return {"topics": related_topics}
