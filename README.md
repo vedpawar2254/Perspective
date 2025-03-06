@@ -1,5 +1,5 @@
 # Perspective-AI
-
+ 
 ### Table of Contents
 - [System Overview](#system-overview)
 - [Architecture Components](#architecture-components)
